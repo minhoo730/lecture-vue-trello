@@ -9,23 +9,28 @@
         </router-link>
       </div>
       <div class="board-item board-item-new">
-        <a class="new-board-btn" href="" @click.prevent="addBoard">
+        <a class="new-board-btn" href="" @click.prevent="SET_IS_ADD_BOARD (true)">
           Create new board...
         </a>
       </div>
     </div>
+    <add-board v-if="isAddBoard" @close="isAddBoard=false"></add-board>
   </div>
 </template>
 
 <script>
-import {board} from '../api'
+import AddBoard from './AddBoard.vue'
+import {mapMutations, mapActions, mapState} from 'vuex'
+import { board } from '../api'
 
 export default {
+  components: {
+    AddBoard
+  },
   data() {
     return {
       loading: false,
-      boards: [],
-      error: ''
+      error: '',
     }
   },
   created() {
@@ -36,20 +41,29 @@ export default {
       el.style.backgroundColor = el.dataset.bgcolor
     })
   },
+  computed: {
+    ...mapState([
+      'isAddBoard',
+      'boards'
+    ])
+    // isAddBoard() {
+    //   return this.$store.state.isAddBoard;
+    // },
+  },
   methods: {
+    ...mapMutations([
+      'SET_IS_ADD_BOARD',
+    ]),
+    ...mapActions([
+      'FETCH_BOARDS'
+    ]),
     fetchData() {
       this.loading = true
-      board.fetch()
-        .then(data => {
-          this.boards = data.list
-        })
-        .finally(_=> {
+      // board.fetch()
+      this.FETCH_BOARDS().finally(_ => {
           this.loading = false
         })
     },
-    addBoard() {
-      console.log('addBoard()')
-    }
   }
 }
 </script>
